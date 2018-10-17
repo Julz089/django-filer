@@ -2,8 +2,8 @@
 from __future__ import absolute_import
 
 from django import forms
-from django.utils.translation import string_concat
-from django.utils.translation import ugettext as _
+
+from django.utils.text import format_lazy
 from django.utils.translation import ugettext_lazy
 
 from ..settings import FILER_IMAGE_MODEL
@@ -69,11 +69,11 @@ class ImageAdminForm(forms.ModelForm):
 
         self._set_previous_subject_location(cleaned_data)
         raise forms.ValidationError(
-            string_concat(
-                err_msg,
-                ugettext_lazy('Your input: "{subject_location}". '.format(
-                    subject_location=subject_location)),
-                'Previous value is restored.'),
+            format_lazy('{} {} {}',
+                        err_msg,
+                        ugettext_lazy('Your input: "{subject_location}". '.format(
+                            subject_location=subject_location)),
+                        'Previous value is restored.'),
             code=err_code)
 
     class Meta(object):

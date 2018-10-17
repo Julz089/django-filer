@@ -5,7 +5,10 @@ from __future__ import absolute_import, unicode_literals
 import mptt
 from django.conf import settings
 from django.contrib.auth import models as auth_models
-from django.core import urlresolvers
+try:
+    from django import urls as urlresolvers
+except ImportError:
+    from django.core import urlresolvers
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
@@ -100,7 +103,7 @@ class Folder(models.Model, mixins.IconsMixin):
     _icon = 'plainfolder'
 
     parent = models.ForeignKey('self', verbose_name=('parent'), null=True, blank=True,
-                               related_name='children')
+                               related_name='children', on_delete=models.CASCADE)
     name = models.CharField(_('name'), max_length=255)
 
     owner = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'), verbose_name=_('owner'),
@@ -262,7 +265,7 @@ class FolderPermission(models.Model):
         (DENY, _('deny')),
     )
 
-    folder = models.ForeignKey(Folder, verbose_name=('folder'), null=True, blank=True)
+    folder = models.ForeignKey(Folder, verbose_name=('folder'), null=True, blank=True, on_delete=models.SET_NULL)
 
     type = models.SmallIntegerField(_('type'), choices=TYPES, default=ALL)
     user = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
@@ -270,7 +273,7 @@ class FolderPermission(models.Model):
                              verbose_name=_("user"), blank=True, null=True)
     group = models.ForeignKey(auth_models.Group,
                               related_name="filer_folder_permissions",
-                              verbose_name=_("group"), blank=True, null=True)
+                              verbose_name=_("group"), blank=True, null=True, on_delete=models.SET_NULL)
     everybody = models.BooleanField(_("everybody"), default=False)
 
     can_edit = models.SmallIntegerField(_("can edit"), choices=PERMISIONS, blank=True, null=True, default=None)

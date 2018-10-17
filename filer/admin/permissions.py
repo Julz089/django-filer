@@ -2,7 +2,10 @@
 from __future__ import absolute_import
 
 from django.contrib import admin
-from django.core.urlresolvers import reverse
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
 
 
 class PrimitivePermissionAwareModelAdmin(admin.ModelAdmin):
